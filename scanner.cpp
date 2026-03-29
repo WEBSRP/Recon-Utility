@@ -13,7 +13,7 @@ string inputTarget(){
     return target;
 }
 
-int inputPort(){
+int inputSinglePort(){
     int port;
 
     cout<<"Enter Port :";
@@ -32,6 +32,27 @@ int inputPort(){
 
     return port;
 }
+
+void inputPortRangeValues(int &start, int &end){
+    
+    cout<<"Enter Starting Port:";
+    cin>> start;
+    cout<<"Enter Ending Port:";
+    cin >> end;
+    
+
+}
+
+int chooseMode(){
+    int mode;
+    int p;
+    
+    cout<<"1.Single port Scan"<<endl;
+    cout<<"2.Range of port Scan"<<endl;
+    cout<<"Choose Mode:";
+    cin >> mode;
+  return mode ;
+} 
 
 // void protocolinfo(int port){
 //      if(port ==80){
@@ -143,4 +164,14 @@ void connectTarget(string target,int port){
     // cout << "Trying to connect ....."<< endl;
 
     close(clientSocket);
+}
+
+
+void scanRange(string target,int start,int end){
+
+    for(int port = start; port <= end; port++){
+
+        connectTarget(target,port);
+
+    }
 }
