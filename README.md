@@ -1,67 +1,71 @@
-# Recon Utility v1.0
+# Recon Utility v1.1
 
-A lightweight C++ reconnaissance utility built as an early systems programming and networking project.
+A lightweight C++ reconnaissance utility built to understand how low-level network scanners work internally using socket programming and structured input handling.
 
 ## Overview
 
-Recon Utility performs basic target validation and TCP connectivity checks against a given IPv4 address and port.
-It is designed to demonstrate:
+Recon Utility is a personal systems programming and cybersecurity learning project focused on understanding how reconnaissance tools perform:
 
-* Input sanitization
-* IPv4 validation
-* Port validation
-* Socket programming in C++
-* Banner grabbing
-* Basic service awareness
+* target validation
+* port validation
+* TCP connection testing
+* banner grabbing
+* basic multi-port scanning logic
 
-## Features
+The objective is not to replace professional scanners, but to build core networking logic manually and understand what happens behind tools like Nmap.
 
-### Input Validation
+---
 
-* Accepts only valid IPv4 format
-* Rejects alphabetic input
+## Features in v1.1
+
+### Target Validation
+
+* Accepts IPv4 input only
+* Rejects alphabetic characters
 * Rejects special characters
-* Verifies exactly 4 octets
-* Checks each octet is within 0–255
+* Validates 4 octets
+* Checks octet range (0–255)
 
 ### Port Validation
 
-* Accepts only valid numeric ports
-* Rejects invalid characters
-* Valid range: 1–65535
+* Accepts valid numeric ports only
+* Rejects invalid input
+* Range: 1–65535
 
-### TCP Connection
+### Scan Modes
 
-* Creates TCP socket using POSIX socket APIs
-* Attempts connection to target host and port
-* Detects success or failure
+* Single Port Scan
+* Port Range Scan
+
+User can now choose scan mode before scanning.
+
+### TCP Connection Check
+
+* Creates socket using POSIX socket APIs
+* Attempts connection to target host and selected port
+* Reports connection success/failure
 
 ### Banner Grabbing
 
-* Reads available banner after successful connection
-* Example:
-  SSH-2.0-OpenSSH_10.0
+On successful connection, reads available service banner.
 
-### Risk Classification
+Example:
 
-Currently basic static classification for common ports:
-
-* 21 → FTP
-* 22 → SSH
-* 23 → Telnet
-* 80 → HTTP
-* 443 → HTTPS
+SSH-2.0-OpenSSH_10.0
+---
 
 ## Project Structure
 
 main.cpp
-Program flow and control logic
+Program flow, mode selection, scan routing
 
 scanner.h
 Function declarations
 
 scanner.cpp
-Input handling, validation, socket connection, banner grabbing
+Validation logic, socket handling, banner grabbing, range scanning
+
+---
 
 ## Build
 
@@ -69,44 +73,76 @@ Input handling, validation, socket connection, banner grabbing
 g++ main.cpp scanner.cpp -o recon
 ```
 
+---
+
 ## Run
 
 ```bash
 ./recon
 ```
 
-## Example
+---
+
+## Example Usage
+
+### Single Port Scan
 
 ```bash
 Enter the target: 127.0.0.1
-Enter Port :22
+Choose Mode
+1.Single port Scan
+2.Range of port Scan
 
-Target:127.0.0.1
-Port:22
-Connection successful
-Banner: SSH-2.0-OpenSSH_10.0
+Enter Port :22
 ```
+
+### Range Scan
+
+```bash
+Enter the target: 127.0.0.1
+Choose Mode
+1.Single port Scan
+2.Range of port Scan
+
+Enter Starting Port:
+20
+Enter Ending Port:
+30
+```
+
+---
 
 ## Current Limitations
 
-* Single port scan only
-* No timeout control
+* Sequential scanning only
+* No timeout handling
 * No DNS resolution
-* No parallel scanning
-* Basic service detection only
+* Static protocol hints
+* Banner depends on open service response
 
-## Planned Improvements (v1.1)
+---
 
-* Connection timeout handling
-* Dynamic banner-based protocol detection
-* Multi-port scanning
-* Better error handling
-* Modular scanner class
+## Planned Improvements (v1.2)
+
+* Connection timeout control
+* Better service detection
+* Protocol inference from banner
+* Faster scan loop
+* Cleaner output formatting
+* Modular scanner class design
+
+---
 
 ## Purpose
 
-This project is part of my systems programming and cybersecurity learning journey, focused on understanding low-level networking rather than replacing professional tools.
+This project is built as part of practical cybersecurity learning:
+
+**Best way to understand recon tools is building one.**
+
+The project focuses on coding logic first, then improving technical depth step by step.
+
+---
 
 ## Version
 
-v1.0
+v1.1
