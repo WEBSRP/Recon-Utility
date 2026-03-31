@@ -2,6 +2,7 @@
 #include<iostream>
 #include"string.h"
 #include<sys/socket.h>
+#include<sys/time.h>
 #include<arpa/inet.h>
 #include<unistd.h>
 using namespace std;
@@ -54,42 +55,7 @@ int chooseMode(){
   return mode ;
 } 
 
-// void protocolinfo(int port){
-//      if(port ==80){
-//         cout<< "Protocol Used: HTTP"<< endl;
-//         cout<< "Security note: webservice exposed"<<endl;
-//     }else if(port == 21){
-//         cout<< "Protocol Used: FTP"<< endl;
-//         cout<< "Security note: File Transfer Protocol exposed"<<endl;
-//         cout<< "Hint:Anonymous login maybe enabled"<< endl;
-//     }else if(port==22){
-//         cout<< "Protocol Used: SSH"<< endl;
-//         cout<< "Security note: SSH exposed"<<endl;
-//         cout<< "Hint:SSH Brute force"<< endl;
-//     }else if(port == 23){
-//         cout<< "Protocol Used: telnet"<< endl;
-//         cout<< "Security note: telnet exposed"<<endl;
-//         cout<< "Hint:Sends Plaintext"<< endl;
-//     }else if(port==443){
-//         cout<< "Protocol Used: HTTPS"<< endl;
-//         cout<< "Security note: webservice exposed"<<endl;
-//     }else{
-//         cout<< "Protocol Used: Unknown commmon service"<<endl;
-//     }
 
-
-
-//     if(port >=1 && port<=1024){
-//         cout << port <<"-> Well known port"<< endl;
-//     }else if(port >=1025 && port<= 49151){
-
-//         cout<<port<< "->Registered Port"<< endl;
-//     }else{
-//         cout <<port<< "->Dynamic port"<< endl;
-//     }
-
-
-//}
 
 void riskInfo(int port){
     if(port==22){
@@ -109,7 +75,7 @@ void riskInfo(int port){
 void displayresult(string target,int port){
     cout << "\nTarget:"<< target << endl;
     cout<< "Port:"<< port << endl;
-    // protocolinfo(port);  
+    
 }
 
 bool ValidateIP(string target){
@@ -146,6 +112,14 @@ void connectTarget(string target,int port){
 
     int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 
+    struct timeval timeout;
+    timeout.tv_sec=0;
+    timeout.tv_usec=500000;
+
+    setsockopt(clientSocket, SOL_SOCKET,SO_RCVTIMEO,&timeout , sizeof(timeout));
+    setsockopt(clientSocket, SOL_SOCKET,SO_SNDTIMEO,&timeout , sizeof(timeout));
+
+
     sockaddr_in serverAddress={};
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_port = htons(port);
@@ -153,20 +127,23 @@ void connectTarget(string target,int port){
     inet_pton(AF_INET, target.c_str(), &serverAddress.sin_addr);
 
     if(connect(clientSocket,(sockaddr*)&serverAddress,sizeof(serverAddress))==0){
-        cout<<"Connection successful"<<endl;
+        cout<<"Port:"<<port<<" ->Open"<<endl;
         char buffer[1024] = {0};
-        recv(clientSocket, buffer, sizeof(buffer), 0);
-        cout<<"Banner: "<<buffer<<endl;
-    }
+        int byte = recv(clientSocket, buffer, sizeof(buffer), 0);
+        if (byte > 0){
+            cout<<"Banner: "<<buffer<<endl;
+        }
+        cout<<"------------------------"<<endl;
+        }
     else{
-        cout<<"Connection failed"<<endl;
+        close(clientSocket);
+        return ;
+    
+        }
+    
+        
+    
     }
-    // cout << "Trying to connect ....."<< endl;
-
-    close(clientSocket);
-}
-
-
 void scanRange(string target,int start,int end){
 
     for(int port = start; port <= end; port++){
