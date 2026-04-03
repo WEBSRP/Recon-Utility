@@ -4,6 +4,7 @@
 #include<sys/socket.h>
 #include<sys/time.h>
 #include<arpa/inet.h>
+#include"netdb.h"
 #include<unistd.h>
 using namespace std;
 
@@ -108,6 +109,22 @@ bool ValidateIP(string target){
     return true;
 }
 
+
+
+string resolveHostname(string target){
+    struct hostent *host=gethostbyname(target.c_str());
+    if(host == NULL){
+        return " ";
+    }
+    struct in_addr **addr_list = (struct in_addr**) host ->h_addr_list;
+    if(addr_list[0] != NULL){
+        return inet_ntoa(*addr_list[0]);
+
+    }
+
+    return "";
+}
+
 void connectTarget(string target,int port){
 
     int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -128,7 +145,11 @@ void connectTarget(string target,int port){
 
     if(connect(clientSocket,(sockaddr*)&serverAddress,sizeof(serverAddress))==0){
         cout<<"Port:"<<port<<" ->Open"<<endl;
-        char buffer[1024] = {0};
+        char buffer[4096] = {0};
+
+        if (port ==80||port==8080){
+           send(clientSocket, "HEAD / HTTP/1.0\r\n\r\n", 18, 0); 
+        }
         int byte = recv(clientSocket, buffer, sizeof(buffer), 0);
         if (byte > 0){
             cout<<"Banner: "<<buffer<<endl;

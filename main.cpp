@@ -5,7 +5,17 @@ int main(){
 
     string target = inputTarget();
 
-    if(ValidateIP(target)==true){
+    if(ValidateIP(target)==false){
+
+        string resolved= resolveHostname(target);
+        if (resolved != ""){
+            cout << "Resolved IP:"<<resolved<<endl;
+            target = resolved;
+
+        }else{
+            cout<<"Invalid Address !"<<endl;
+            return 0;
+        }
 
         int mode = chooseMode();
 

@@ -11,3 +11,4 @@ void riskInfo(int port);
 void displayresult(string target,int port);
 void connectTarget(string target,int port);
 void scanRange(string target,int start,int end);
+string resolveHostname(string target);
