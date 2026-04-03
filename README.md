@@ -1,69 +1,124 @@
-# Recon Utility v1.1
+# Recon Utility v1.3
 
-A lightweight C++ reconnaissance utility built to understand how low-level network scanners work internally using socket programming and structured input handling.
+A lightweight C++ reconnaissance utility built to understand how low-level network scanners work internally using socket programming, timeout handling, hostname resolution, and structured scan logic.
 
 ## Overview
 
-Recon Utility is a personal systems programming and cybersecurity learning project focused on understanding how reconnaissance tools perform:
+Recon Utility is a personal systems programming and cybersecurity learning project focused on manually building core reconnaissance logic to understand what happens behind professional tools.
+
+Current learning areas covered:
 
 * target validation
+* hostname resolution
 * port validation
 * TCP connection testing
+* timeout-based scanning
 * banner grabbing
-* basic multi-port scanning logic
+* single-port and range scanning
 
-The objective is not to replace professional scanners, but to build core networking logic manually and understand what happens behind tools like Nmap.
+The objective is not to replace professional scanners like Nmap, but to understand how scanning logic is implemented internally.
 
 ---
 
-## Features in v1.1
+## Features in v1.3
 
 ### Target Validation
 
-* Accepts IPv4 input only
-* Rejects alphabetic characters
-* Rejects special characters
+* Accepts valid IPv4 addresses
+* Rejects malformed IP input
 * Validates 4 octets
-* Checks octet range (0–255)
+* Checks each octet range (0–255)
+
+### Hostname Resolution (New in v1.3)
+
+* Accepts domain names such as:
+
+```bash
+google.com
+scanme.nmap.org
+```
+
+* Resolves hostname into IPv4 before scanning using DNS lookup
+
+Example:
+
+```bash
+Resolved IP: 142.250.x.x
+```
 
 ### Port Validation
 
-* Accepts valid numeric ports only
-* Rejects invalid input
-* Range: 1–65535
+* Accepts numeric ports only
+* Valid range: 1–65535
 
 ### Scan Modes
 
 * Single Port Scan
 * Port Range Scan
 
-User can now choose scan mode before scanning.
+User selects scan mode before execution.
 
-### TCP Connection Check
+### TCP Connection Scan
 
-* Creates socket using POSIX socket APIs
-* Attempts connection to target host and selected port
-* Reports connection success/failure
+* Uses POSIX socket APIs
+* Attempts TCP handshake against target port
+* Reports open ports accurately
+
+### Timeout Handling
+
+* Socket timeout added for faster and more stable scans
+* Prevents hanging on slow/non-responsive ports
 
 ### Banner Grabbing
 
-On successful connection, reads available service banner.
+Reads service banner when available.
 
 Example:
 
-SSH-2.0-OpenSSH_10.0
+```bash
+Port:21 -> Open
+Banner: 220 (vsFTPd 3.0.5)
+```
+
+### Range Scanning
+
+Scans port interval:
+
+```bash
+Start Port:20
+End Port:25
+```
+
+Example output:
+
+```bash
+Port:21 -> Open
+Port:22 -> Open
+Port:23 -> Closed
+```
+
+### Basic Risk Classification
+
+Static risk hints for common ports:
+
+* 21 → FTP
+* 22 → SSH
+* 23 → Telnet
+* 80 → HTTP
+* 443 → HTTPS
+
 ---
 
 ## Project Structure
 
 main.cpp
-Program flow, mode selection, scan routing
+Program flow, target handling, mode selection
 
 scanner.h
 Function declarations
 
 scanner.cpp
-Validation logic, socket handling, banner grabbing, range scanning
+Validation logic, hostname resolution, socket connection, timeout handling, banner grabbing, range scan logic
 
 ---
 
@@ -85,51 +140,48 @@ g++ main.cpp scanner.cpp -o recon
 
 ## Example Usage
 
+### Scan with Hostname
+
+```bash
+Enter the target: google.com
+Resolved IP: 142.x.x.x
+```
+
 ### Single Port Scan
 
 ```bash
-Enter the target: 127.0.0.1
-Choose Mode
+Choose Mode:
 1.Single port Scan
 2.Range of port Scan
-
-Enter Port :22
 ```
 
 ### Range Scan
 
 ```bash
-Enter the target: 127.0.0.1
-Choose Mode
-1.Single port Scan
-2.Range of port Scan
-
-Enter Starting Port:
-20
-Enter Ending Port:
-30
+Enter Starting Port:20
+Enter Ending Port:25
 ```
 
 ---
 
 ## Current Limitations
 
-* Sequential scanning only
-* No timeout handling
-* No DNS resolution
+* Sequential scan only
 * Static protocol hints
-* Banner depends on open service response
+* HTTP banner handling limited
+* No filtered state detection yet
+* No hostname reverse lookup
 
 ---
 
-## Planned Improvements (v1.2)
+## Planned Improvements (v1.4)
 
-* Connection timeout control
+* Filtered / timeout port classification
+* Scan summary report
+* Progress indicator
 * Better service detection
-* Protocol inference from banner
-* Faster scan loop
-* Cleaner output formatting
-* Modular scanner class design
+* Cleaner formatted output
+* Reverse DNS support
 
 ---
 
@@ -137,12 +189,12 @@ Enter Ending Port:
 
 This project is built as part of practical cybersecurity learning:
 
-**Best way to understand recon tools is building one.**
+**Best way to understand recon tools is building one manually.**
 
-The project focuses on coding logic first, then improving technical depth step by step.
+Focus is on learning systems programming logic first, then improving technical depth step by step.
 
 ---
 
 ## Version
 
-v1.1
+v1.3
