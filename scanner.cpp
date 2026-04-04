@@ -6,6 +6,7 @@
 #include<arpa/inet.h>
 #include"netdb.h"
 #include<unistd.h>
+#include"error.h"
 using namespace std;
 
 string inputTarget(){
@@ -145,6 +146,7 @@ void connectTarget(string target,int port){
 
     if(connect(clientSocket,(sockaddr*)&serverAddress,sizeof(serverAddress))==0){
         cout<<"Port:"<<port<<" ->Open"<<endl;
+    
         char buffer[4096] = {0};
 
         if (port ==80||port==8080){
@@ -157,14 +159,28 @@ void connectTarget(string target,int port){
         cout<<"------------------------"<<endl;
         }
     else{
-        close(clientSocket);
-        return ;
-    
+        if(errno == ETIMEDOUT){
+               cout<<"Filtered"<<endl;
+            }
+          else if(errno == ECONNREFUSED){
+               cout<<"Closed"<<endl;
+            }
+            else{
+                cout<<"Unknown / Possibly Filtered"<<endl;
+                }
         }
+        
+
     
+
+    close(clientSocket);
+    return;
+    }
         
     
-    }
+        
+
+
 void scanRange(string target,int start,int end){
 
     for(int port = start; port <= end; port++){
