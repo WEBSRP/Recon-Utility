@@ -1,5 +1,6 @@
 #include"scanner.h"
 #include<iostream>
+#include <string>
 #include"string.h"
 #include<sys/socket.h>
 #include<sys/time.h>
@@ -77,7 +78,6 @@ void riskInfo(int port){
 void displayresult(string target,int port){
     cout << "\nTarget:"<< target << endl;
     cout<< "Port:"<< port << endl;
-    
 }
 
 bool ValidateIP(string target){
