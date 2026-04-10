@@ -1,13 +1,15 @@
-#include"scanner.h"
-#include<iostream>
+#include "scanner.h"
+#include <iostream>
 #include <string>
-#include"string.h"
-#include<sys/socket.h>
-#include<sys/time.h>
-#include<arpa/inet.h>
-#include"netdb.h"
-#include<unistd.h>
-#include"error.h"
+#include "string.h"
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <arpa/inet.h>
+#include "netdb.h"
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/select.h>
+#include <errno.h>
 using namespace std;
 
 string inputTarget(){
@@ -159,16 +161,24 @@ void connectTarget(string target,int port){
         cout<<"------------------------"<<endl;
         }
     else{
-        if(errno == ETIMEDOUT){
-               cout<<"Filtered"<<endl;
-            }
-          else if(errno == ECONNREFUSED){
-               cout<<"Closed"<<endl;
-            }
-            else{
-                cout<<"Unknown / Possibly Filtered"<<endl;
-                }
-        }
+    int so_error;
+    socklen_t len = sizeof(so_error);
+
+    getsockopt(clientSocket, SOL_SOCKET, SO_ERROR, &so_error, &len);
+
+    if(so_error == ETIMEDOUT){
+        cout << "Filtered" << endl;
+    }
+    else if(so_error == ECONNREFUSED){
+        cout << "Closed" << endl;
+    }
+    else if(so_error == EHOSTUNREACH || so_error == ENETUNREACH){
+        cout << "Filtered / Unreachable" << endl;
+    }
+    else{
+        cout << "Unknown / Possibly Filtered" << endl;
+    }
+}
         
 
     
