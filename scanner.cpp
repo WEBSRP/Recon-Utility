@@ -12,6 +12,27 @@
 #include <errno.h>
 using namespace std;
 
+
+
+void showBanner() {
+    cout << R"(
+
+███╗   ██╗      ███████╗ ██████╗  █████╗ ███╗   ██╗
+████╗  ██║      ██╔════╝██╔════╝ ██╔══██╗████╗  ██║
+██╔██╗ ██║█████╗███████╗██║      ███████║██╔██╗ ██║
+██║╚██╗██║╚════╝╚════██║██║      ██╔══██║██║╚██╗██║
+██║ ╚████║      ███████║╚██████╗ ██║  ██║██║ ╚████║
+╚═╝  ╚═══╝      ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝
+
+N-SCAN v1.3
+----------------------------------------
+Made by   : websrp
+LinkedIn  : https://www.linkedin.com/in/websrp/
+----------------------------------------
+
+)";
+}
+
 string inputTarget(){
     string target;
     cout << "Enter the target:";
@@ -161,22 +182,23 @@ void connectTarget(string target,int port){
         cout<<"------------------------"<<endl;
         }
     else{
-    int so_error;
-    socklen_t len = sizeof(so_error);
+    int err = errno;
+    cout << "errno = " << err << endl;
 
-    getsockopt(clientSocket, SOL_SOCKET, SO_ERROR, &so_error, &len);
-
-    if(so_error == ETIMEDOUT){
-        cout << "Filtered" << endl;
+    if(err == ECONNREFUSED){
+        cout << "Port:" << port << " -> Closed" << endl;
     }
-    else if(so_error == ECONNREFUSED){
-        cout << "Closed" << endl;
+    else if(err == ETIMEDOUT){
+        cout << "Port:" << port << " -> Filtered" << endl;
     }
-    else if(so_error == EHOSTUNREACH || so_error == ENETUNREACH){
-        cout << "Filtered / Unreachable" << endl;
+    else if(err == EINPROGRESS){
+        cout << "Port:" << port << " -> Filtered (Connection Pending)" << endl;
+    }
+    else if(err == EHOSTUNREACH || err == ENETUNREACH){
+        cout << "Port:" << port << " -> Filtered / Unreachable" << endl;
     }
     else{
-        cout << "Unknown / Possibly Filtered" << endl;
+        cout << "Port:" << port << " -> Unknown (" << err << ")" << endl;
     }
 }
         

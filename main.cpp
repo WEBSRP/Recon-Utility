@@ -5,6 +5,8 @@ using namespace std;
 
 int main(){
 
+    showBanner();
+
     string target = inputTarget();   // take target input (IP or hostname)
 
     if(ValidateIP(target) == false){   // if input is NOT a valid IP, try hostname resolution

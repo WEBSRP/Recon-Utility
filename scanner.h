@@ -1,6 +1,8 @@
 #include <iostream>
 using namespace std;
 
+void showBanner();
+
 string inputTarget();
 string resolveHostname(string target);
 int inputSinglePort();
