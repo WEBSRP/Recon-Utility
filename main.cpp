@@ -13,7 +13,7 @@ int main(){
 
         string resolved = resolveHostname(target);   // convert hostname to IPv4
 
-        if(resolved != ""){   // if resolution successful
+        if(!resolved.empty()){   // if resolution successful
             cout<<"Resolved IP: "<<resolved<<endl;
             target = resolved;   // replace hostname with resolved IP
         }

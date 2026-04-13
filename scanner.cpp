@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <sys/select.h>
 #include <errno.h>
+#include<iomanip>
 using namespace std;
 
 
@@ -168,7 +169,7 @@ void connectTarget(string target,int port){
     inet_pton(AF_INET, target.c_str(), &serverAddress.sin_addr);
 
     if(connect(clientSocket,(sockaddr*)&serverAddress,sizeof(serverAddress))==0){
-        cout<<"Port:"<<port<<" ->Open"<<endl;
+        
     
         char buffer[4096] = {0};
 
@@ -177,13 +178,18 @@ void connectTarget(string target,int port){
         }
         int byte = recv(clientSocket, buffer, sizeof(buffer), 0);
         if (byte > 0){
-            cout<<"Banner: "<<buffer<<endl;
+            string banner=buffer;
+            cout << left << setw(10) << port
+            << setw(15) << "OPEN"
+            << setw(20) << "Connected"
+            << setw(30) << banner.substr(0,25)
+            << endl;
         }
         cout<<"------------------------"<<endl;
         }
     else{
     int err = errno;
-    cout << "errno = " << err << endl;
+   
 
     if(err == ECONNREFUSED){
         cout << "Port:" << port << " -> Closed" << endl;
@@ -192,7 +198,7 @@ void connectTarget(string target,int port){
         cout << "Port:" << port << " -> Filtered" << endl;
     }
     else if(err == EINPROGRESS){
-        cout << "Port:" << port << " -> Filtered (Connection Pending)" << endl;
+        // cout << "Port:" << port << " -> Filtered (Connection Pending)" << endl;
     }
     else if(err == EHOSTUNREACH || err == ENETUNREACH){
         cout << "Port:" << port << " -> Filtered / Unreachable" << endl;
@@ -208,16 +214,38 @@ void connectTarget(string target,int port){
     close(clientSocket);
     return;
     }
-        
-    
-        
+
+
+    void showProgress(int current, int total) {
+    int width = 30;
+    float ratio = (float)current / total;
+    int pos = ratio * width;
+
+    cout << "\r[";
+    for(int i = 0; i < width; i++) {
+        if(i < pos) cout << "=";
+        else if(i == pos) cout << ">";
+        else cout << " ";
+    }
+
+    cout << "] " << int(ratio * 100) << "%";
+    cout.flush();
+}
 
 
 void scanRange(string target,int start,int end){
+    int port;
+   
+    
 
-    for(int port = start; port <= end; port++){
+    for( port = start; port <= end; port++){
 
         connectTarget(target,port);
+        
+        
 
     }
+    cout<<endl;
+
+    
 }
