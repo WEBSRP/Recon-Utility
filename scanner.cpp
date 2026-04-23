@@ -167,35 +167,60 @@ void connectTarget(string target,int port){
     serverAddress.sin_port = htons(port);
 
     inet_pton(AF_INET, target.c_str(), &serverAddress.sin_addr);
+    int result = connect(clientSocket,(sockaddr*)&serverAddress,sizeof(serverAddress));
 
-    if(connect(clientSocket,(sockaddr*)&serverAddress,sizeof(serverAddress))==0){
+    if(result == 0){
+
+    timeval timeout;
+    timeout.tv_sec = 2;
+    timeout.tv_usec = 0;
+
+    setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+
+    char buffer[1024] = {0};
+
+    int bytes = recv(clientSocket, buffer, sizeof(buffer), 0);
+
+    if(bytes > 0){
+        string banner = buffer;
+
+        cout << left
+             << setw(10) << port
+             << setw(12) << "OPEN"
+             << setw(15) << "Connected"
+             << setw(25) << banner.substr(0,20)
+             << endl;
+    }
+    else{
+        cout << left
+             << setw(10) << port
+             << setw(12) << "OPEN"
+             << setw(15) << "Connected"
+             << setw(25) << "No banner"
+             << endl;
+    }
+}
         
-    
-        char buffer[4096] = {0};
-
-        if (port ==80||port==8080){
-           send(clientSocket, "HEAD / HTTP/1.0\r\n\r\n", 18, 0); 
-        }
-        int byte = recv(clientSocket, buffer, sizeof(buffer), 0);
-        if (byte > 0){
-            string banner=buffer;
-            cout << left << setw(10) << port
-            << setw(15) << "OPEN"
-            << setw(20) << "Connected"
-            << setw(30) << banner.substr(0,25)
-            << endl;
-        }
-        cout<<"------------------------"<<endl;
-        }
+        
     else{
     int err = errno;
    
 
     if(err == ECONNREFUSED){
-        cout << "Port:" << port << " -> Closed" << endl;
+        cout << left
+             << setw(10) << port
+             << setw(12) << "CLOSED"
+             << setw(15) << "-"
+             << setw(30) << "-"
+             << endl;
     }
     else if(err == ETIMEDOUT){
-        cout << "Port:" << port << " -> Filtered" << endl;
+        cout << left
+             << setw(10) << port
+             << setw(12) << "FILTERED"
+             << setw(15) << "-"
+             << setw(30) << "-"
+             << endl;
     }
     else if(err == EINPROGRESS){
         // cout << "Port:" << port << " -> Filtered (Connection Pending)" << endl;
@@ -235,17 +260,28 @@ void connectTarget(string target,int port){
 
 void scanRange(string target,int start,int end){
     int port;
+    cout << left
+         << setw(10) << "PORT"
+         << setw(12) << "STATE"
+         << setw(15) << "STATUS"
+         << setw(30) << "BANNER"
+         << endl;
+
+cout << "--------------------------------------------------------------" << endl;
    
     
+int total = end - start + 1;
+int current = 0;
 
-    for( port = start; port <= end; port++){
+for(int port = start; port <= end; port++){
 
-        connectTarget(target,port);
-        
-        
+    connectTarget(target, port);
 
-    }
-    cout<<endl;
+    current++;
+}
+
+showProgress(total, total);
+cout << endl;
 
     
 }

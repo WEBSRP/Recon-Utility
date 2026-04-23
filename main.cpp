@@ -1,5 +1,6 @@
 #include <iostream>
 #include "scanner.h"
+#include <iomanip>
 
 using namespace std;
 
@@ -35,6 +36,14 @@ int main(){
             riskInfo(port);
 
             cout<<"Checking for connections..."<<endl;
+            cout << left
+            << setw(10) << "PORT"
+            << setw(12) << "STATE"
+            << setw(15) << "STATUS"
+            << setw(25) << "BANNER"
+            << endl;
+
+cout << "--------------------------------------------------------------" << endl;
 
             connectTarget(target, port);
         }

@@ -1,109 +1,146 @@
-# Recon Utility v1.3
+# Recon Utility v1.4
 
-A lightweight C++ reconnaissance utility built to understand how low-level network scanners work internally using socket programming, timeout handling, hostname resolution, and structured scan logic.
-
-## Overview
-
-Recon Utility is a personal systems programming and cybersecurity learning project focused on manually building core reconnaissance logic to understand what happens behind professional tools.
-
-Current learning areas covered:
-
-* target validation
-* hostname resolution
-* port validation
-* TCP connection testing
-* timeout-based scanning
-* banner grabbing
-* single-port and range scanning
-
-The objective is not to replace professional scanners like Nmap, but to understand how scanning logic is implemented internally.
+A lightweight C++ reconnaissance utility built to understand how low-level network scanners work internally using socket programming, timeout handling, hostname resolution, structured scan logic, and banner collection.
 
 ---
 
-## Features in v1.3
+## Overview
+
+Recon Utility is a personal systems programming and cybersecurity learning project focused on manually building core reconnaissance logic to understand what happens internally in professional scanners.
+
+The goal is not to replace scanners like Nmap, but to learn how network reconnaissance works at socket level.
+
+---
+
+## Features
 
 ### Target Validation
 
 * Accepts valid IPv4 addresses
-* Rejects malformed IP input
-* Validates 4 octets
-* Checks each octet range (0–255)
+* Rejects malformed input
+* Validates all 4 octets
+* Ensures octet range is 0–255
 
-### Hostname Resolution (New in v1.3)
+---
 
-* Accepts domain names such as:
+### Hostname Resolution
+
+Accepts hostnames such as:
 
 ```bash
 google.com
 scanme.nmap.org
 ```
 
-* Resolves hostname into IPv4 before scanning using DNS lookup
+Resolves hostname into IPv4 before scanning using DNS lookup.
 
 Example:
 
 ```bash
-Resolved IP: 142.250.x.x
+Resolved IP: 142.x.x.x
 ```
+
+---
 
 ### Port Validation
 
 * Accepts numeric ports only
 * Valid range: 1–65535
 
+---
+
 ### Scan Modes
 
-* Single Port Scan
-* Port Range Scan
+#### Single Port Scan
 
-User selects scan mode before execution.
-
-### TCP Connection Scan
-
-* Uses POSIX socket APIs
-* Attempts TCP handshake against target port
-* Reports open ports accurately
-
-### Timeout Handling
-
-* Socket timeout added for faster and more stable scans
-* Prevents hanging on slow/non-responsive ports
-
-### Banner Grabbing
-
-Reads service banner when available.
+Scans one specific port.
 
 Example:
 
 ```bash
-Port:21 -> Open
-Banner: 220 (vsFTPd 3.0.5)
+Enter Port:22
 ```
 
-### Range Scanning
+---
 
-Scans port interval:
+#### Port Range Scan
+
+Scans a port interval.
+
+Example:
 
 ```bash
 Start Port:20
-End Port:25
+End Port:30
 ```
 
-Example output:
+---
+
+### TCP Connect Scan
+
+Uses POSIX socket APIs to attempt TCP connection against target ports.
+
+---
+
+### Timeout Handling
+
+Socket timeout added to avoid hanging on slow or non-responsive services.
+
+---
+
+### Banner Grabbing
+
+Reads service banners when available.
+
+Example:
 
 ```bash
-Port:21 -> Open
-Port:22 -> Open
-Port:23 -> Closed
+22   OPEN   Connected   SSH-2.0-OpenSSH...
+25   OPEN   Connected   220 debian.localdomain
 ```
+
+If no banner is returned:
+
+```bash
+No banner
+```
+
+---
+
+### Output Formatting
+
+Structured terminal output with aligned columns:
+
+```bash
+PORT      STATE       STATUS         BANNER
+--------------------------------------------------------------
+22        OPEN        Connected      SSH-2.0-OpenSSH...
+23        CLOSED      -              -
+25        OPEN        Connected      220 debian.localdomain
+```
+
+---
+
+### Progress Indicator
+
+A scan completion progress bar is shown after range scanning.
+
+Example:
+
+```bash
+[==============================] 100%
+```
+
+---
 
 ### Basic Risk Classification
 
-Static risk hints for common ports:
+Static hints for common ports:
 
 * 21 → FTP
 * 22 → SSH
 * 23 → Telnet
+* 25 → SMTP
 * 80 → HTTP
 * 443 → HTTPS
 
@@ -111,21 +148,25 @@ Static risk hints for common ports:
 
 ## Project Structure
 
+```bash
 main.cpp
-Program flow, target handling, mode selection
-
 scanner.h
-Function declarations
-
 scanner.cpp
-Validation logic, hostname resolution, socket connection, timeout handling, banner grabbing, range scan logic
+README.md
+```
+
+### File Roles
+
+* **main.cpp** → program flow and mode handling
+* **scanner.h** → function declarations
+* **scanner.cpp** → scanning logic, validation, DNS resolution, timeout handling, banner grabbing, formatted output
 
 ---
 
 ## Build
 
 ```bash
-g++ main.cpp scanner.cpp -o recon
+g++ main.cpp scanner.cpp -o nscan
 ```
 
 ---
@@ -133,33 +174,30 @@ g++ main.cpp scanner.cpp -o recon
 ## Run
 
 ```bash
-./recon
+./nscan
 ```
 
 ---
 
 ## Example Usage
 
-### Scan with Hostname
-
-```bash
-Enter the target: google.com
-Resolved IP: 142.x.x.x
-```
-
 ### Single Port Scan
 
 ```bash
-Choose Mode:
-1.Single port Scan
-2.Range of port Scan
+Enter target:10.49.138.48
+Choose Mode:1
+Enter Port:22
 ```
+
+---
 
 ### Range Scan
 
 ```bash
+Enter target:10.49.138.48
+Choose Mode:2
 Enter Starting Port:20
-Enter Ending Port:25
+Enter Ending Port:30
 ```
 
 ---
@@ -167,34 +205,36 @@ Enter Ending Port:25
 ## Current Limitations
 
 * Sequential scan only
-* Static protocol hints
-* HTTP banner handling limited
-* No filtered state detection yet
-* No hostname reverse lookup
+* No multithreading yet
+* Static service hints
+* Limited protocol-specific probing
+* No filtered-state accuracy for all services
+* Banner grabbing depends on service response
 
 ---
 
-## Planned Improvements (v1.4)
+## Planned Improvements (v1.5)
 
-* Filtered / timeout port classification
+* Multithreaded scanning
+* Filtered port refinement
+* Service-specific probes
+* Reverse DNS lookup
 * Scan summary report
-* Progress indicator
-* Better service detection
-* Cleaner formatted output
-* Reverse DNS support
+* Optional hidden closed ports
 
 ---
 
-## Purpose
+## Learning Focus
 
-This project is built as part of practical cybersecurity learning:
+This project is built to strengthen:
 
-**Best way to understand recon tools is building one manually.**
-
-Focus is on learning systems programming logic first, then improving technical depth step by step.
+* C++ systems programming
+* Socket programming
+* Linux networking concepts
+* Practical reconnaissance understanding
 
 ---
 
 ## Version
 
-v1.3
+**v1.4**
