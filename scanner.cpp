@@ -11,6 +11,7 @@
 #include <sys/select.h>
 #include <errno.h>
 #include<iomanip>
+#include"banner.h"
 using namespace std;
 
 
@@ -176,19 +177,15 @@ void connectTarget(string target,int port){
     timeout.tv_usec = 0;
 
     setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+    if (result==0){
 
-    char buffer[1024] = {0};
-
-    int bytes = recv(clientSocket, buffer, sizeof(buffer), 0);
-
-    if(bytes > 0){
-        string banner = buffer;
+        string banner = grabHTTPbanner(target, port);
 
         cout << left
              << setw(10) << port
              << setw(12) << "OPEN"
              << setw(15) << "Connected"
-             << setw(25) << banner.substr(0,20)
+             << setw(25) << banner.substr(0, min((size_t)35, banner.size()))
              << endl;
     }
     else{
