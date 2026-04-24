@@ -1,240 +1,120 @@
-# Recon Utility v1.4
+# 🔍 Recon Utility (N-SCAN)
 
-A lightweight C++ reconnaissance utility built to understand how low-level network scanners work internally using socket programming, timeout handling, hostname resolution, structured scan logic, and banner collection.
+A lightweight C++ network reconnaissance utility built to understand how real scanners work internally — from raw socket connections to service fingerprinting.
 
----
-
-## Overview
-
-Recon Utility is a personal systems programming and cybersecurity learning project focused on manually building core reconnaissance logic to understand what happens internally in professional scanners.
-
-The goal is not to replace scanners like Nmap, but to learn how network reconnaissance works at socket level.
+This project is being developed as a personal low-level networking learning project, with the goal of manually building features that tools like Nmap perform automatically.
 
 ---
 
-## Features
+# ⚙️ Current Features
 
-### Target Validation
+## ✅ Port Scanning
+- Single port scan
+- Range-based port scan
+- Open / Closed / Filtered state detection
 
-* Accepts valid IPv4 addresses
-* Rejects malformed input
-* Validates all 4 octets
-* Ensures octet range is 0–255
+## ✅ Risk Level Classification
+- Basic risk categorization based on port type
 
----
-
-### Hostname Resolution
-
-Accepts hostnames such as:
-
-```bash
-google.com
-scanme.nmap.org
-```
-
-Resolves hostname into IPv4 before scanning using DNS lookup.
+## ✅ HTTP Banner Grabbing (v1.5)
+- Sends manual HTTP HEAD request
+- Reads server response headers
+- Extracts server banner information
 
 Example:
 
-```bash
-Resolved IP: 142.x.x.x
-```
+Server: Apache/2.4.41 (Ubuntu)
 
 ---
 
-### Port Validation
+# 🧠 What This Project Is Teaching
 
-* Accepts numeric ports only
-* Valid range: 1–65535
+This project is focused on understanding:
 
----
+- TCP socket creation
+- Manual connect() handling
+- Timeout tuning
+- recv() / send() behavior
+- Service response parsing
+- Application-layer protocol interaction
 
-### Scan Modes
-
-#### Single Port Scan
-
-Scans one specific port.
-
-Example:
-
-```bash
-Enter Port:22
-```
+Instead of using libraries that hide networking internals, the logic is built manually to understand every stage.
 
 ---
 
-#### Port Range Scan
+# 🛠 Project Structure
 
-Scans a port interval.
-
-Example:
-
-```bash
-Start Port:20
-End Port:30
-```
+main.cpp        → UI + execution flow  
+scanner.cpp     → Port scanning logic  
+scanner.h       → Scanner declarations  
+banner.cpp      → HTTP banner grabbing logic  
+banner.h        → Banner function declarations  
 
 ---
 
-### TCP Connect Scan
+# 🚀 Current Working Flow
 
-Uses POSIX socket APIs to attempt TCP connection against target ports.
-
----
-
-### Timeout Handling
-
-Socket timeout added to avoid hanging on slow or non-responsive services.
+1. Target input  
+2. Port selection  
+3. TCP connection attempt  
+4. Port state detection  
+5. HTTP banner extraction (for HTTP services)
 
 ---
 
-### Banner Grabbing
+# 📌 Sample Output
 
-Reads service banners when available.
-
-Example:
-
-```bash
-22   OPEN   Connected   SSH-2.0-OpenSSH...
-25   OPEN   Connected   220 debian.localdomain
-```
-
-If no banner is returned:
-
-```bash
-No banner
-```
+80    OPEN    Connected    Server: Apache/2.4.41 (Ubuntu)
 
 ---
 
-### Output Formatting
+# ⚡ Build & Run
 
-Structured terminal output with aligned columns:
+## Compile
 
-```bash
-PORT      STATE       STATUS         BANNER
---------------------------------------------------------------
-22        OPEN        Connected      SSH-2.0-OpenSSH...
-23        CLOSED      -              -
-25        OPEN        Connected      220 debian.localdomain
-```
-
----
-
-### Progress Indicator
-
-A scan completion progress bar is shown after range scanning.
-
-Example:
-
-```bash
-[==============================] 100%
-```
-
----
-
-### Basic Risk Classification
-
-Static hints for common ports:
-
-* 21 → FTP
-* 22 → SSH
-* 23 → Telnet
-* 25 → SMTP
-* 80 → HTTP
-* 443 → HTTPS
-
----
-
-## Project Structure
-
-```bash
-main.cpp
-scanner.h
-scanner.cpp
-README.md
-```
-
-### File Roles
-
-* **main.cpp** → program flow and mode handling
-* **scanner.h** → function declarations
-* **scanner.cpp** → scanning logic, validation, DNS resolution, timeout handling, banner grabbing, formatted output
-
----
-
-## Build
-
-```bash
-g++ main.cpp scanner.cpp -o nscan
-```
-
----
+g++ main.cpp scanner.cpp banner.cpp -o nscan
 
 ## Run
 
-```bash
 ./nscan
-```
 
 ---
 
-## Example Usage
+# 🧪 Current Focus
 
-### Single Port Scan
+Fine-tuning service detection logic and improving banner extraction reliability.
 
-```bash
-Enter target:10.49.138.48
-Choose Mode:1
-Enter Port:22
-```
+Upcoming improvements:
 
----
-
-### Range Scan
-
-```bash
-Enter target:10.49.138.48
-Choose Mode:2
-Enter Starting Port:20
-Enter Ending Port:30
-```
+- HTTPS banner grabbing 🔐  
+- Better service-based banner detection 🌐  
+- Smarter port classification 📊  
+- Cleaner modular architecture 🧩  
 
 ---
 
-## Current Limitations
+# 📂 GitHub
 
-* Sequential scan only
-* No multithreading yet
-* Static service hints
-* Limited protocol-specific probing
-* No filtered-state accuracy for all services
-* Banner grabbing depends on service response
+If you check the project, feedback is welcome ⭐
 
 ---
 
-## Planned Improvements (v1.5)
+# 🧰 Built With
 
-* Multithreaded scanning
-* Filtered port refinement
-* Service-specific probes
-* Reverse DNS lookup
-* Scan summary report
-* Optional hidden closed ports
+- C++
+- Linux sockets
+- POSIX networking APIs
 
 ---
 
-## Learning Focus
+# 📖 Purpose
 
-This project is built to strengthen:
+This is not being built as a college submission or internship project.
 
-* C++ systems programming
-* Socket programming
-* Linux networking concepts
-* Practical reconnaissance understanding
+It is a hands-on learning project to deeply understand how scanners actually work internally.
 
 ---
 
-## Version
+# ⭐ Feedback Welcome
 
-**v1.4**
+If you test it, suggest improvements, or spot design issues, feel free to share feedback.
